@@ -26,6 +26,7 @@ from launch.substitutions import (
 )
 from launch_ros.actions import LifecycleNode, Node
 from launch_ros.substitutions import FindPackageShare
+from launch_ros.parameter_descriptions import ParameterValue
 
 COMPOSED_TEMPLATE_XACRO = "robot_with_external_axis_template.urdf.xacro"
 
@@ -264,7 +265,7 @@ def launch_setup(context, *args, **kwargs):
         xacro_arguments.extend(template_xacro_args)
 
     robot_description_content = Command(xacro_arguments, on_stderr="capture")
-    robot_description = {"robot_description": robot_description_content}
+    robot_description = {"robot_description": ParameterValue(robot_description_content, value_type=str)}
 
     # The driver config contains only parameters that can be changed after startup
     driver_config = get_package_share_directory("kuka_rsi_driver") + "/config/driver_config.yaml"
