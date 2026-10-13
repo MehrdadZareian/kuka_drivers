@@ -17,3 +17,20 @@
     action_monitor_rate: 20.0
     allow_nonzero_velocity_at_trajectory_end: true
     allow_partial_joints_goal: true
+
+    # Stop-during-motion fix (rsi_only + #ABSOLUTE):
+    # If the robot is stopped on the smartPAD mid-motion, the JTC would keep advancing
+    # the setpoint. With these tolerances the goal is aborted once the measured position
+    # falls behind, and the JTC holds the MEASURED position (set_hold_position() uses
+    # state_current_ in Jazzy). Must be larger than the normal following lag -> tune.
+    # Keep decelerate_on_cancel false: velocity states are NaN in this setup.
+    constraints:
+      stopped_velocity_tolerance: 0.0   # velocity states are NaN -> don't check
+      goal_time: 1.0                    # s; abort + hold actual if stopped near the end
+      rail_joint_1: {trajectory: 0.03, goal: 0.005}   # m
+      joint_1: {trajectory: 0.05, goal: 0.01}         # rad (~2.9 deg / 0.6 deg)
+      joint_2: {trajectory: 0.05, goal: 0.01}
+      joint_3: {trajectory: 0.05, goal: 0.01}
+      joint_4: {trajectory: 0.05, goal: 0.01}
+      joint_5: {trajectory: 0.05, goal: 0.01}
+      joint_6: {trajectory: 0.05, goal: 0.01}
