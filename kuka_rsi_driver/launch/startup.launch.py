@@ -48,6 +48,8 @@ def launch_setup(context, *args, **kwargs):
     kl_ros2_control_joints_macro = LaunchConfiguration("kl_ros2_control_joints_macro")
     mode = LaunchConfiguration("mode")
     use_gpio = LaunchConfiguration("use_gpio")
+    gpio_config = LaunchConfiguration("gpio_config")
+    gpio_controller_config = LaunchConfiguration("gpio_controller_config")
     driver_version = LaunchConfiguration("driver_version")
     client_ip = LaunchConfiguration("client_ip")
     client_port = LaunchConfiguration("client_port")
@@ -251,6 +253,12 @@ def launch_setup(context, *args, **kwargs):
         rsi_xml_config_file,
     ]
 
+    # I/O interfaces of the robot description (<gpio> in ros2_control).
+    # Only used with use_gpio:=true; empty keeps an empty <gpio> block.
+    gpio_config_value = gpio_config.perform(context)
+    if use_gpio.perform(context) == "true" and gpio_config_value:
+        xacro_arguments.extend([" ", "gpio_config:=", gpio_config_value])
+
     if use_external_axis_value:
         xacro_arguments.extend(
             [
@@ -353,7 +361,9 @@ def launch_setup(context, *args, **kwargs):
     }
 
     if use_gpio.perform(context) == "true":
-        controllers["gpio_controller"] = config_file("gpio_controller_config.yaml")
+        controllers["gpio_controller"] = (
+            gpio_controller_config.perform(context) or config_file("gpio_controller_config.yaml")
+        )
 
     if driver_version.perform(context) in {"eki_rsi", "mxa_rsi"}:
         controllers["control_mode_handler"] = config_file("kuka_control_mode_handler_config.yaml")
@@ -433,6 +443,26 @@ def generate_launch_description():
     launch_arguments.append(DeclareLaunchArgument("mode", default_value="hardware"))
     launch_arguments.append(
         DeclareLaunchArgument("use_gpio", default_value="false", choices=["true", "false"])
+    )
+    launch_arguments.append(
+        DeclareLaunchArgument(
+            "gpio_config",
+            default_value="",
+            description=(
+                "Absolute path to a xacro file with a gpio_config macro (the <gpio> "
+                "interfaces). Used only with use_gpio:=true."
+            ),
+        )
+    )
+    launch_arguments.append(
+        DeclareLaunchArgument(
+            "gpio_controller_config",
+            default_value="",
+            description=(
+                "Absolute path to the gpio_controller YAML. Empty = "
+                "gpio_controller_config.yaml in controller_config_dir."
+            ),
+        )
     )
     launch_arguments.append(
         DeclareLaunchArgument(
