@@ -126,7 +126,8 @@ protected:
   rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr cycle_time_pub_;
   CycleTime cycle_time_{CycleTime::UNDEFINED};  // 1 => 4 ms (RSI_4MS), 2 => 12 ms (RSI_12MS)
 
-  static constexpr int HARDWARE_ACTIVATION_TIMEOUT_MS = 15'000;
+  // Longer than ACTIVATION_READ_TIMEOUT_MS of the rsi_only hardware interface
+  static constexpr int HARDWARE_ACTIVATION_TIMEOUT_MS = 65'000;
   static constexpr int HARDWARE_DEACTIVATION_TIMEOUT_MS = 15'000;
 };
 }  // namespace kuka_rsi_driver

@@ -187,6 +187,8 @@ protected:
   static constexpr std::chrono::seconds DRIVES_POWERED_TIMEOUT{3};
   static constexpr std::chrono::milliseconds DRIVES_POWERED_CHECK_INTERVAL{100};
   static constexpr int64_t READ_TIMEOUT_MS = 1'000;
+  // rsi_only activation: wait this long for the first RSI packet
+  static constexpr int64_t ACTIVATION_READ_TIMEOUT_MS = 60'000;
 
   // threshold for logging slow RSI responses
   static constexpr std::chrono::milliseconds kWarningThreshold{2};

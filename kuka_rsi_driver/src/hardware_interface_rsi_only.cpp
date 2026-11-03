@@ -47,7 +47,9 @@ CallbackReturn KukaRSIHardwareInterface::on_activate(const rclcpp_lifecycle::Sta
 {
   ResetDiagnostics();
 
-  Read(10 * READ_TIMEOUT_MS);
+  // Wait up to 60 s for the first RSI packet, so the operator has time to
+  // start the RSI program on the smartPAD within one activation attempt.
+  Read(ACTIVATION_READ_TIMEOUT_MS);
 
   std::copy(
     interface_data_.position_states.cbegin(), interface_data_.position_states.cend(),
